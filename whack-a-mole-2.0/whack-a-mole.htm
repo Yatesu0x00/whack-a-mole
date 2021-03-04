@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Whack a Mole</title>
+	<script>
+		var mole;
+		var hammer;
+		var rasen;
+		var spiel;
+		var pointsEle;
+		var points = 0;
+		var maxPoints = 0;
+		var moleRespawnTime = 1500;
+		var timeoutID;
+
+		var canMove = false;
+
+		window.onload = function(){
+			mole = document.getElementById("mole");
+			hammer = document.getElementById("hammer");
+			rasen = document.getElementById("rasen");
+			spiel = document.getElementById("spiel");
+			pointsEle = document.getElementById("points")
+
+			mole.style.visibility = "hidden";
+			hammer.style.visibility = "hidden";
+			document.onmousemove = function(e){
+				if(canMove)
+				setElePos(hammer, new Vector2(e.clientX - 20, e.clientY - 20));
+			}
+
+			mole.onclick = function(e){
+				points++;
+				moleRespawnTime -= 50;
+				setNewMolePos();
+			};
+			pointsEle.innerHTML = "Points: " +  String(points) + "/" +String(maxPoints);
+
+			if(maxPoints == 30){
+				
+			}
+		}
+
+		function startGame(){
+			console.log("Start");
+			var newMolePos = GetNewMolePos();
+			setElePos(mole, newMolePos);
+			mole.style.visibility = "visible";
+			hammer.style.visibility = "visible";
+			canMove = true;
+			document.body.style.cursor = "none";
+			timeoutID = setTimeout(function(){
+				setNewMolePos();
+			}, moleRespawnTime);
+		}
+
+		function reloadPage(){
+			location.reload();
+		}
+
+		function setNewMolePos(){
+			setElePos(mole, GetNewMolePos());
+			maxPoints++;
+			pointsEle.innerHTML = "Points: " +  String(points) + "/" +String(maxPoints);
+			clearTimeout(timeoutID);
+			timeoutID = setTimeout(function(){
+				setNewMolePos();
+			}, moleRespawnTime)
+		}
+
+		function GetNewMolePos(){
+			var xPos = getRandomInt(rasen.clientWidth - mole.clientWidth);
+			var yPos = getRandomInt(rasen.clientHeight- mole.clientHeight);
+			return new Vector2(xPos, yPos);
+		}
+
+		function setElePos(element, position){
+			element.style.top = position.y+"px";
+			element.style.left = position.x+"px";
+		}
+
+		function getRandomInt(max) {
+  			return Math.floor(Math.random() * Math.floor(max));
+		}
+
+		var Vector2 = function(x,y){
+			this.x = x;
+			this.y = y;
+		};
+	</script>
+	<style>
+		#spiel{
+			width: 1000px;
+			height: 600Px;
+		}
+		#rasen{
+			width: 100%;
+			height: 100%;
+		}
+		#mole{
+			width: 5%;
+			height: auto;
+			position: absolute;
+			z-index: 1;
+		}
+		#hammer{
+			z-index: 2;
+			position: absolute;
+			pointer-events: none;
+		}
+		
+		*, *::after, *::before {
+			-webkit-user-select: none;
+			-webkit-user-drag: none;
+			-webkit-app-region: no-drag;
+			cursor:auto ;
+		}
+		body{
+			margin:0px;
+			padding: 0px;
+		}
+	</style>
+</head>
+<body>
+	<div id="spiel">
+		<img src="imgs/rasen.jpg" id="rasen">
+		<img src="imgs/mole.gif" id="mole">
+		<img src="imgs/hammer.gif" id="hammer">
+		<button onclick="startGame()">Start</button>
+		<button onclick="reloadPage()">Neustarten</button>
+		<b id="points"></b>
+
+		<p>Die Zeit bis zum nächsten Maulwurf wechsel verringert sich jedes mal wenn der Maulwurf angeklickt wurde um 50ms</p>
+	</div>
+</body>
+</html>
+
