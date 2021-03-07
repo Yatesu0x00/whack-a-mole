@@ -11,10 +11,11 @@
 		var spiel;
 		var pointsEle;
 		var points = 0;
-		var maxPoints = 0;
+		var maxPoints = 30;
+		var maxPointsHidden = 0;
 		var moleRespawnTime = 1500;
 		var timeoutID;
-
+		var clickedOnce;
 		var canMove = false;
 
 		window.onload = function(){
@@ -26,24 +27,25 @@
 
 			mole.style.visibility = "hidden";
 			hammer.style.visibility = "hidden";
-			document.onmousemove = function(e){
+			
+			document.onmousemove = function(e)
+			{
 				if(canMove)
 				setElePos(hammer, new Vector2(e.clientX - 20, e.clientY - 20));
 			}
 
-			mole.onclick = function(e){
+			mole.onclick = function(e)
+			{			
 				points++;
 				moleRespawnTime -= 50;
 				setNewMolePos();
 			};
-			pointsEle.innerHTML = "Points: " +  String(points) + "/" +String(maxPoints);
-
-			if(maxPoints == 30){
-				
-			}
+			pointsEle.innerHTML = "Points: " +  String(points) + "/" +String(maxPoints);	
 		}
 
-		function startGame(){
+		function startGame()
+		{
+			document.getElementById("startB").disabled = true;
 			console.log("Start");
 			var newMolePos = GetNewMolePos();
 			setElePos(mole, newMolePos);
@@ -51,28 +53,47 @@
 			hammer.style.visibility = "visible";
 			canMove = true;
 			document.body.style.cursor = "none";
-			timeoutID = setTimeout(function(){
+						
+			timeoutID = setTimeout(function()
+			{
 				setNewMolePos();
 			}, moleRespawnTime);
 		}
 
-		function reloadPage(){
+		function reloadPage()
+		{
 			location.reload();
 		}
 
-		function setNewMolePos(){
+		function setNewMolePos()
+		{							
 			setElePos(mole, GetNewMolePos());
-			maxPoints++;
-			pointsEle.innerHTML = "Points: " +  String(points) + "/" +String(maxPoints);
+			maxPointsHidden++;
+			pointsEle.innerHTML = "Points: " +  String(points) + "/" +String(maxPoints);							
+
+			console.log(maxPoints);
+
+			if(maxPointsHidden == maxPoints){
+				if(confirm("Noch eine Runde?"))
+				{
+					reloadPage();
+					startGame();
+				}
+				else{
+					reloadPage();
+				}
+			}
+
 			clearTimeout(timeoutID);
-			timeoutID = setTimeout(function(){
-				setNewMolePos();
-			}, moleRespawnTime)
-		}
+			timeoutID = setTimeout(function()
+			{			
+				setNewMolePos();			
+			}, moleRespawnTime)		
+		}	
 
 		function GetNewMolePos(){
-			var xPos = getRandomInt(rasen.clientWidth - mole.clientWidth);
-			var yPos = getRandomInt(rasen.clientHeight- mole.clientHeight);
+			var xPos = getRandomInt(rasen.clientWidth - mole.clientWidth - 5);
+			var yPos = getRandomInt(rasen.clientHeight- mole.clientHeight - 5);
 			return new Vector2(xPos, yPos);
 		}
 
@@ -81,7 +102,8 @@
 			element.style.left = position.x+"px";
 		}
 
-		function getRandomInt(max) {
+		function getRandomInt(max)
+		{
   			return Math.floor(Math.random() * Math.floor(max));
 		}
 
@@ -91,13 +113,18 @@
 		};
 	</script>
 	<style>
+		body{
+			background-color: rgb(58, 58, 58);
+		}
 		#spiel{
-			width: 1000px;
-			height: 600Px;
+			cursor: url('imgs/hammer.gif'), pointer;
+			width: 1080px;
+			height: 600px;	
+			margin: 5px;		
 		}
 		#rasen{
-			width: 100%;
-			height: 100%;
+			width: 1440px;
+			height: 768px;
 		}
 		#mole{
 			width: 5%;
@@ -105,34 +132,37 @@
 			position: absolute;
 			z-index: 1;
 		}
-		#hammer{
-			z-index: 2;
-			position: absolute;
-			pointer-events: none;
-		}
-		
-		*, *::after, *::before {
-			-webkit-user-select: none;
-			-webkit-user-drag: none;
-			-webkit-app-region: no-drag;
-			cursor:auto ;
-		}
 		body{
 			margin:0px;
 			padding: 0px;
+		}
+		button{
+			width: 325px;
+			height: 45px;
+			font-size: 25px;
+			font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+		}
+		#points{
+			color: #ffffffe8;
+			position: fixed;
+			top: 1%;
+			left: 76%;
+			font-size: 45px;
+			font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 		}
 	</style>
 </head>
 <body>
 	<div id="spiel">
-		<img src="imgs/rasen.jpg" id="rasen">
+		<span id="points"></span>
+		<img src="imgs/rasenNew.png" id="rasen">		
 		<img src="imgs/mole.gif" id="mole">
-		<img src="imgs/hammer.gif" id="hammer">
-		<button onclick="startGame()">Start</button>
-		<button onclick="reloadPage()">Neustarten</button>
-		<b id="points"></b>
-
-		<p>Die Zeit bis zum nächsten Maulwurf wechsel verringert sich jedes mal wenn der Maulwurf angeklickt wurde um 50ms</p>
+		<img id="hammer">	
+		<div>
+			<button id="startB"onclick="startGame()">Start</button>
+			<button onclick="reloadPage()">Neustarten</button>
+			<button>Bestenliste</button>
+		</div>				
 	</div>
 </body>
 </html>
